@@ -1,6 +1,7 @@
 package com.puce.gym.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,27 @@ public class PartnerController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<Partner>> getPartnersActive(){
+        return ResponseEntity.ok(partnerService.getPartnersActive(true));
+    }
+
+    @GetMapping("/plan/{plan}")
+    public ResponseEntity<List<Partner>> getPartnersByPlan(@PathVariable String plan){
+        return ResponseEntity.ok(partnerService.getPartnersByPlan(plan));
+    }
+
+    @GetMapping("/income")
+    public ResponseEntity<Double> getTotalMonthlyPayments() {
+        return partnerService.getTotalMonthlyPayments();
+    }
+
+    @GetMapping("income-by-plan")
+    public ResponseEntity<Map<String,Double>> getIncomeByPlan() {
+        return ResponseEntity.ok(partnerService.getIncomeByPlan());
+    }
+
 
     @PostMapping("/create")
     public ResponseEntity<Partner> createPartner(@RequestBody Partner partner){

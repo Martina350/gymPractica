@@ -1,8 +1,11 @@
 package com.puce.gym.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.puce.gym.models.Partner;
@@ -22,6 +25,31 @@ public class PartnerService {
 
     public Optional<Partner> getPartnerById(int id){
         return partnerRepository.findById(id);
+    }
+
+    public List<Partner> getPartnersActive(boolean isActive){
+        return partnerRepository.findByIsActive(isActive);
+    }
+
+    public List<Partner> getPartnersByPlan(String plan){
+        return partnerRepository.findByPlanIgnoreCase(plan);
+    }
+
+    public ResponseEntity<Double> getTotalMonthlyPayments() {
+        List<Partner> activePartners = partnerRepository.findByIsActive(true);
+        double totalPayments = activePartners.stream()
+                .mapToDouble(Partner::getMonthlyPayment)
+                .sum();
+        return ResponseEntity.ok(totalPayments);
+    }
+
+    public Map <String, Double> getIncomeByPlan (){
+        List<Partner> activePartners = partnerRepository.findByIsActive(true);
+        return activePartners.stream()
+            .collect(Collectors.groupingBy(
+                    Partner::getPlan,
+                    Collectors.summingDouble(Partner::getMonthlyPayment)
+            ));
     }
 
     public Partner createPartner(Partner partner){
