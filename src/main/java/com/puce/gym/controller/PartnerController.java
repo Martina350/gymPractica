@@ -53,11 +53,20 @@ public class PartnerController {
         return partnerService.getTotalMonthlyPayments();
     }
 
-    @GetMapping("income-by-plan")
+    @GetMapping("/income-plan")
     public ResponseEntity<Map<String,Double>> getIncomeByPlan() {
         return ResponseEntity.ok(partnerService.getIncomeByPlan());
     }
 
+    @PutMapping("/{id}/active")
+    public ResponseEntity<Partner> activatePartner(@PathVariable int id) {
+        return partnerService.activatePartner(id);
+    }
+
+    @PutMapping("/{id}/inactive")
+    public ResponseEntity<Partner> deactivatePartner(@PathVariable int id) {
+        return partnerService.deactivatePartner(id);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Partner> createPartner(@RequestBody Partner partner){

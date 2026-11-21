@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,28 @@ public class PartnerService {
                     Partner::getPlan,
                     Collectors.summingDouble(Partner::getMonthlyPayment)
             ));
+    }
+    
+    public ResponseEntity<Partner> activatePartner(int id) {
+        return updatePartnerStatus(id, true);
+    }
+
+    public ResponseEntity<Partner> deactivatePartner(int id) {
+        return updatePartnerStatus(id, false);
+    }
+
+    private ResponseEntity<Partner> updatePartnerStatus(int id, boolean newStatus) {
+        Optional<Partner> optionalPartner = partnerRepository.findById(id);
+            if (optionalPartner.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+        Partner partner = optionalPartner.get();
+            if (partner.isActive() == newStatus) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            partner.setActive(newStatus);
+        Partner savedPartner = partnerRepository.save(partner);
+            return ResponseEntity.ok(savedPartner);
     }
 
     public Partner createPartner(Partner partner){
